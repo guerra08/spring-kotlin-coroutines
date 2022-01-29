@@ -18,7 +18,7 @@ class DBConfig {
             setDatabasePopulator(CompositeDatabasePopulator()
                 .apply {
                     addPopulators(ResourceDatabasePopulator(ClassPathResource(
-                        "sql/init.sql"
+                        "sql/schema.sql"
                     )))
                 }
             )

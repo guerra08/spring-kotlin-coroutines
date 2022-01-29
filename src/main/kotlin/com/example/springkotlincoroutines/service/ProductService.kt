@@ -22,4 +22,9 @@ class ProductService(val productRepository: ProductRepository) {
 
     suspend fun deleteProduct(product: Product) =
         productRepository.delete(product)
+
+    suspend fun putProduct(product: Product): Product {
+        return productRepository.save(product)
+    }
+
 }

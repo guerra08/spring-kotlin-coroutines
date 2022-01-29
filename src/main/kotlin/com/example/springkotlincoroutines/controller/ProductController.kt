@@ -50,4 +50,22 @@ class ProductController(val productService: ProductService) {
         } ?: ResponseEntity.notFound().build()
     }
 
+    @PutMapping("product/{id}")
+    suspend fun putProduct(
+        @PathVariable id: Long,
+        @RequestBody body: PostProductDTO
+    ): ResponseEntity<Product> {
+        return productService.getProductById(id)?.let {
+            ResponseEntity.ok(
+                productService.putProduct(
+                    Product(
+                        id = id,
+                        name = body.name,
+                        brand = body.brand
+                    )
+                )
+            )
+        } ?: ResponseEntity.notFound().build()
+    }
+
 }
