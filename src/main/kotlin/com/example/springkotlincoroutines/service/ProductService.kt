@@ -16,4 +16,10 @@ class ProductService(val productRepository: ProductRepository) {
 
     suspend fun createProduct(product: Product) =
         productRepository.save(product)
+
+    suspend fun getAllProductsByBrand(brand: String) =
+        productRepository.findByBrandContainingIgnoreCase(brand)
+
+    suspend fun deleteProduct(product: Product) =
+        productRepository.delete(product)
 }

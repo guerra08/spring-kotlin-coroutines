@@ -26,6 +26,11 @@ class ProductController(val productService: ProductService) {
         } ?: ResponseEntity.notFound().build()
     }
 
+    @GetMapping("/product/brand/{brand}")
+    suspend fun getAllProductsByBrand(@PathVariable brand: String): Flow<Product> {
+        return productService.getAllProductsByBrand(brand)
+    }
+
     @PostMapping("/product")
     suspend fun postProduct(@RequestBody body: PostProductDTO): Product {
         return productService.createProduct(
@@ -35,6 +40,14 @@ class ProductController(val productService: ProductService) {
                 brand = body.brand
             )
         )
+    }
+
+    @DeleteMapping("/product/{id}")
+    suspend fun deleteProduct(@PathVariable id: Long): ResponseEntity<Product> {
+        return productService.getProductById(id)?.let {
+            productService.deleteProduct(it)
+            ResponseEntity.noContent().build()
+        } ?: ResponseEntity.notFound().build()
     }
 
 }
