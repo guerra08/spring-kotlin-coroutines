@@ -3,6 +3,7 @@ package com.example.springkotlincoroutines.controller
 import com.example.springkotlincoroutines.entity.Product
 import com.example.springkotlincoroutines.service.ProductService
 import kotlinx.coroutines.flow.Flow
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -19,8 +20,10 @@ class ProductController(val productService: ProductService) {
     }
 
     @GetMapping("/product/{id}")
-    suspend fun getProduct(@PathVariable id: Long): Product? {
-        return productService.getProductById(id)
+    suspend fun getProduct(@PathVariable id: Long): ResponseEntity<Product> {
+        return productService.getProductById(id)?.let {
+            ResponseEntity.ok(it)
+        } ?: ResponseEntity.notFound().build()
     }
 
     @PostMapping("/product")
