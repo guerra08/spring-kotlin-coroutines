@@ -26,8 +26,8 @@ data class PatchProductDTO(
 /**
  * Extension functions regarding Product
  */
-fun CreateProductDTO.toProductEntity() = Product(
-    id = null,
+fun CreateProductDTO.toProductEntity(id: Long? = null) = Product(
+    id = id,
     name = this.name,
     brand = this.brand
 )

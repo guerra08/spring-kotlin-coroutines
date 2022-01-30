@@ -57,4 +57,20 @@ class ProductHandler(
         } ?: ServerResponse.notFound().buildAndAwait()
     }
 
+    suspend fun putProduct(req: ServerRequest): ServerResponse {
+        val id = req.pathVariable("id").toLong()
+        val productFromBody = req.awaitBodyOrNull(CreateProductDTO::class)
+
+        return productFromBody?.let { product ->
+            productRepository.findById(id)?.let {
+                ServerResponse
+                    .ok()
+                    .json()
+                    .bodyValueAndAwait(
+                        productRepository.save(product.toProductEntity(id))
+                    )
+            } ?: ServerResponse.notFound().buildAndAwait()
+        } ?: ServerResponse.badRequest().buildAndAwait()
+    }
+
 }

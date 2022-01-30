@@ -22,6 +22,7 @@ class Routes(
             "/{id}".nest {
                 GET("", productHandler::getProductById)
                 DELETE("", productHandler::deleteProduct)
+                PUT("", productHandler::putProduct)
             }
         }
     }
