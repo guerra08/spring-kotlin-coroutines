@@ -1,6 +1,7 @@
 package com.example.springkotlincoroutines.handler
 
 import com.example.springkotlincoroutines.domain.CreateProductDTO
+import com.example.springkotlincoroutines.domain.PatchProductDTO
 import com.example.springkotlincoroutines.domain.toProductEntity
 import com.example.springkotlincoroutines.repository.ProductRepository
 import org.springframework.stereotype.Component
@@ -61,13 +62,31 @@ class ProductHandler(
         val id = req.pathVariable("id").toLong()
         val productFromBody = req.awaitBodyOrNull(CreateProductDTO::class)
 
-        return productFromBody?.let { product ->
+        return productFromBody?.let { putProduct ->
             productRepository.findById(id)?.let {
                 ServerResponse
                     .ok()
                     .json()
                     .bodyValueAndAwait(
-                        productRepository.save(product.toProductEntity(id))
+                        productRepository.save(putProduct.toProductEntity(id))
+                    )
+            } ?: ServerResponse.notFound().buildAndAwait()
+        } ?: ServerResponse.badRequest().buildAndAwait()
+    }
+
+    suspend fun patchProduct(req: ServerRequest): ServerResponse {
+        val id = req.pathVariable("id").toLong()
+        val productFromBody = req.awaitBodyOrNull(PatchProductDTO::class)
+
+        return productFromBody?.let { patchProduct ->
+            productRepository.findById(id)?.let { original ->
+                ServerResponse
+                    .ok()
+                    .json()
+                    .bodyValueAndAwait(
+                        productRepository.save(
+                            patchProduct.toProductEntity(original)
+                        )
                     )
             } ?: ServerResponse.notFound().buildAndAwait()
         } ?: ServerResponse.badRequest().buildAndAwait()

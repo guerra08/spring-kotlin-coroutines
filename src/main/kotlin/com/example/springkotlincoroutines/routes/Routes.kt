@@ -23,6 +23,7 @@ class Routes(
                 GET("", productHandler::getProductById)
                 DELETE("", productHandler::deleteProduct)
                 PUT("", productHandler::putProduct)
+                PATCH("", productHandler::patchProduct)
             }
         }
     }

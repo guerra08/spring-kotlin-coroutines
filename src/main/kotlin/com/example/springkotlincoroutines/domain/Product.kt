@@ -31,3 +31,9 @@ fun CreateProductDTO.toProductEntity(id: Long? = null) = Product(
     name = this.name,
     brand = this.brand
 )
+
+fun PatchProductDTO.toProductEntity(original: Product) = Product(
+    id = original.id,
+    name = this.name ?: original.name,
+    brand = this.brand ?: original.brand
+)
