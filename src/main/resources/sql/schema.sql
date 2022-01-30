@@ -1,5 +1,6 @@
 CREATE TABLE products (
     id INTEGER AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255),
-    brand VARCHAR(255)
+    brand VARCHAR(255),
+    price DECIMAL(10,2)
 );

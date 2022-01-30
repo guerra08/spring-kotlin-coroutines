@@ -5,14 +5,18 @@ import com.example.springkotlincoroutines.domain.PatchProductDTO
 import com.example.springkotlincoroutines.domain.toProductEntity
 import com.example.springkotlincoroutines.repository.ProductRepository
 import org.springframework.stereotype.Component
+import org.springframework.validation.BeanPropertyBindingResult
+import org.springframework.validation.Validator
 import org.springframework.web.reactive.function.server.*
+import org.springframework.web.server.ServerWebInputException
 
 /**
  * This class contains all the handler functions regarding Product
  */
 @Component
 class ProductHandler(
-    private val productRepository: ProductRepository
+    private val productRepository: ProductRepository,
+    private val validator: Validator
 ) {
 
     suspend fun getAllProducts(req: ServerRequest): ServerResponse {
@@ -35,15 +39,14 @@ class ProductHandler(
     }
 
     suspend fun createProduct(req: ServerRequest): ServerResponse {
-        val productFromBody = req.awaitBodyOrNull(CreateProductDTO::class)
-        return productFromBody?.let {
-            ServerResponse
-                .ok()
-                .json()
-                .bodyValueAndAwait(
-                    productRepository.save(it.toProductEntity())
-                )
-        } ?: ServerResponse.badRequest().buildAndAwait()
+        val productFromBody = req.awaitBody(CreateProductDTO::class)
+        validateCreateProductDTO(productFromBody)
+        return ServerResponse
+            .ok()
+            .json()
+            .bodyValueAndAwait(
+                productRepository.save(productFromBody.toProductEntity())
+            )
     }
 
     suspend fun deleteProduct(req: ServerRequest): ServerResponse {
@@ -60,36 +63,42 @@ class ProductHandler(
 
     suspend fun putProduct(req: ServerRequest): ServerResponse {
         val id = req.pathVariable("id").toLong()
-        val productFromBody = req.awaitBodyOrNull(CreateProductDTO::class)
-
-        return productFromBody?.let { putProduct ->
-            productRepository.findById(id)?.let {
-                ServerResponse
-                    .ok()
-                    .json()
-                    .bodyValueAndAwait(
-                        productRepository.save(putProduct.toProductEntity(id))
-                    )
-            } ?: ServerResponse.notFound().buildAndAwait()
-        } ?: ServerResponse.badRequest().buildAndAwait()
+        val productFromBody = req.awaitBody(CreateProductDTO::class)
+        validateCreateProductDTO(productFromBody)
+        return productRepository.findById(id)?.let {
+            ServerResponse
+                .ok()
+                .json()
+                .bodyValueAndAwait(
+                    productRepository.save(productFromBody.toProductEntity(id))
+                )
+        } ?: ServerResponse.notFound().buildAndAwait()
     }
 
     suspend fun patchProduct(req: ServerRequest): ServerResponse {
         val id = req.pathVariable("id").toLong()
-        val productFromBody = req.awaitBodyOrNull(PatchProductDTO::class)
+        val productFromBody = req.awaitBody(PatchProductDTO::class)
 
-        return productFromBody?.let { patchProduct ->
-            productRepository.findById(id)?.let { original ->
-                ServerResponse
-                    .ok()
-                    .json()
-                    .bodyValueAndAwait(
-                        productRepository.save(
-                            patchProduct.toProductEntity(original)
-                        )
+        return productRepository.findById(id)?.let { original ->
+            ServerResponse
+                .ok()
+                .json()
+                .bodyValueAndAwait(
+                    productRepository.save(
+                        productFromBody.toProductEntity(original)
                     )
-            } ?: ServerResponse.notFound().buildAndAwait()
-        } ?: ServerResponse.badRequest().buildAndAwait()
+                )
+        } ?: ServerResponse.notFound().buildAndAwait()
+    }
+
+    /**
+     * Validator functions
+     */
+    private fun validateCreateProductDTO(dto: CreateProductDTO) {
+        val errors = BeanPropertyBindingResult(dto, "dto")
+        validator.validate(dto, errors)
+        if (errors.hasErrors())
+            throw ServerWebInputException(errors.toString())
     }
 
 }
