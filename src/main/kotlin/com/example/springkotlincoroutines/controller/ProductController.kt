@@ -9,31 +9,32 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 @RestController
+@RequestMapping("/product")
 class ProductController(val productService: ProductService) {
 
-    @GetMapping("/product")
+    @GetMapping
     suspend fun getIndex(): Flow<Product> {
         return productService.retrieveAllProducts()
     }
 
-    @GetMapping("/product/{id}")
+    @GetMapping("{id}")
     suspend fun getProduct(@PathVariable id: Long): ResponseEntity<Product> {
         return productService.getProductById(id)?.let {
             ResponseEntity.ok(it)
         } ?: ResponseEntity.notFound().build()
     }
 
-    @GetMapping("/product/brand/{brand}")
+    @GetMapping("/brand/{brand}")
     suspend fun getAllProductsByBrand(@PathVariable brand: String): Flow<Product> {
         return productService.getAllProductsByBrand(brand)
     }
 
-    @PostMapping("/product")
+    @PostMapping
     suspend fun postProduct(@RequestBody body: CreateProductDTO): Product {
         return productService.createProduct(body)
     }
 
-    @DeleteMapping("/product/{id}")
+    @DeleteMapping("/{id}")
     suspend fun deleteProduct(@PathVariable id: Long): ResponseEntity<Product> {
         return productService.getProductById(id)?.let {
             productService.deleteProduct(it)
@@ -41,7 +42,7 @@ class ProductController(val productService: ProductService) {
         } ?: ResponseEntity.notFound().build()
     }
 
-    @PutMapping("product/{id}")
+    @PutMapping("/{id}")
     suspend fun putProduct(
         @PathVariable id: Long,
         @RequestBody body: CreateProductDTO
@@ -53,7 +54,7 @@ class ProductController(val productService: ProductService) {
         } ?: ResponseEntity.notFound().build()
     }
 
-    @PatchMapping("/product/{id}")
+    @PatchMapping("/{id}")
     suspend fun patchProduct(
         @PathVariable id: Long,
         @RequestBody body: PatchProductDTO
