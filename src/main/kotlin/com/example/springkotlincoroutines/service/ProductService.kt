@@ -34,8 +34,7 @@ class ProductService(val productRepository: ProductRepository) {
     suspend fun putProduct(
         id: Long,
         product: CreateProductDTO
-    )
-            : Product {
+    ): Product {
         return productRepository.save(
             Product(
                 id = id,
