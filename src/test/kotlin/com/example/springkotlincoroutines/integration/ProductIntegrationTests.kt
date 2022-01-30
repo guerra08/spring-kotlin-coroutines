@@ -25,8 +25,8 @@ class ProductIntegrationTests(
         every {
             productRepository.findAll()
         } returns flowOf(
-            Product(1, "First", "Brand"),
-            Product(2, "Second", "Brand")
+            Product(1, "First", "Brand", 20.00),
+            Product(2, "Second", "Brand", 30.00)
         )
 
         client.get()
