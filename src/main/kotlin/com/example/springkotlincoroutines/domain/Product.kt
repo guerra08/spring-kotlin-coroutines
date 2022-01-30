@@ -1,4 +1,4 @@
-package com.example.springkotlincoroutines.entity
+package com.example.springkotlincoroutines.domain
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import org.springframework.data.annotation.Id
