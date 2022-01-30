@@ -1,7 +1,7 @@
 package com.example.springkotlincoroutines.handler
 
 import com.example.springkotlincoroutines.domain.CreateProductDTO
-import com.example.springkotlincoroutines.domain.Product
+import com.example.springkotlincoroutines.domain.toProductEntity
 import com.example.springkotlincoroutines.repository.ProductRepository
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.*
@@ -40,13 +40,7 @@ class ProductHandler(
                 .ok()
                 .json()
                 .bodyValueAndAwait(
-                    productRepository.save(
-                        Product(
-                            id = null,
-                            name = productFromBody.name,
-                            brand = productFromBody.brand
-                        )
-                    )
+                    productRepository.save(it.toProductEntity())
                 )
         } ?: ServerResponse.badRequest().buildAndAwait()
     }

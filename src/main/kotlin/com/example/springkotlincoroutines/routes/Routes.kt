@@ -13,7 +13,8 @@ class Routes(
     private val productHandler: ProductHandler
 ) {
     @Bean
-    fun routes() = coRouter {
+    //coRouter enables the usage of Coroutines DSL
+    fun applicationRoutes() = coRouter {
         "/product".nest {
             GET("", productHandler::getAllProducts)
             POST("", productHandler::createProduct)

@@ -22,3 +22,12 @@ data class PatchProductDTO(
     val name: String?,
     val brand: String?
 )
+
+/**
+ * Extension functions regarding Product
+ */
+fun CreateProductDTO.toProductEntity() = Product(
+    id = null,
+    name = this.name,
+    brand = this.brand
+)
