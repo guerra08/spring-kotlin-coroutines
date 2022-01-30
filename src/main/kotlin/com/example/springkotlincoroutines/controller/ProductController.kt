@@ -1,5 +1,7 @@
 package com.example.springkotlincoroutines.controller
 
+import com.example.springkotlincoroutines.entity.PatchProductDTO
+import com.example.springkotlincoroutines.entity.CreateProductDTO
 import com.example.springkotlincoroutines.entity.Product
 import com.example.springkotlincoroutines.service.ProductService
 import kotlinx.coroutines.flow.Flow
@@ -8,11 +10,6 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 class ProductController(val productService: ProductService) {
-
-    data class PostProductDTO(
-        val name: String,
-        val brand: String
-    )
 
     @GetMapping("/product")
     suspend fun getIndex(): Flow<Product> {
@@ -32,14 +29,8 @@ class ProductController(val productService: ProductService) {
     }
 
     @PostMapping("/product")
-    suspend fun postProduct(@RequestBody body: PostProductDTO): Product {
-        return productService.createProduct(
-            Product(
-                id = null,
-                name = body.name,
-                brand = body.brand
-            )
-        )
+    suspend fun postProduct(@RequestBody body: CreateProductDTO): Product {
+        return productService.createProduct(body)
     }
 
     @DeleteMapping("/product/{id}")
@@ -53,19 +44,24 @@ class ProductController(val productService: ProductService) {
     @PutMapping("product/{id}")
     suspend fun putProduct(
         @PathVariable id: Long,
-        @RequestBody body: PostProductDTO
+        @RequestBody body: CreateProductDTO
     ): ResponseEntity<Product> {
         return productService.getProductById(id)?.let {
             ResponseEntity.ok(
-                productService.putProduct(
-                    Product(
-                        id = id,
-                        name = body.name,
-                        brand = body.brand
-                    )
-                )
+                productService.putProduct(id, body)
             )
         } ?: ResponseEntity.notFound().build()
     }
 
+    @PatchMapping("/product/{id}")
+    suspend fun patchProduct(
+        @PathVariable id: Long,
+        @RequestBody body: PatchProductDTO
+    ): ResponseEntity<Product> {
+        return productService.getProductById(id)?.let {
+            ResponseEntity.ok(
+                productService.patchProduct(it, body)
+            )
+        } ?: ResponseEntity.notFound().build()
+    }
 }

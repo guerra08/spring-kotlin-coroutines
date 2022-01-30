@@ -12,3 +12,13 @@ data class Product(
     val name: String,
     val brand: String
 )
+
+data class CreateProductDTO(
+    val name: String,
+    val brand: String
+)
+
+data class PatchProductDTO(
+    val name: String?,
+    val brand: String?
+)
