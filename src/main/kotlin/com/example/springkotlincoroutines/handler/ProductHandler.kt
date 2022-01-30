@@ -39,14 +39,17 @@ class ProductHandler(
     }
 
     suspend fun createProduct(req: ServerRequest): ServerResponse {
-        val productFromBody = req.awaitBody(CreateProductDTO::class)
-        validateCreateProductDTO(productFromBody)
-        return ServerResponse
-            .ok()
-            .json()
-            .bodyValueAndAwait(
-                productRepository.save(productFromBody.toProductEntity())
-            )
+        val productFromBody = req.awaitBodyOrNull(CreateProductDTO::class)
+
+        return productFromBody?.let { createDto ->
+            validateCreateProductDTO(createDto)
+            ServerResponse
+                .ok()
+                .json()
+                .bodyValueAndAwait(
+                    productRepository.save(productFromBody.toProductEntity())
+                )
+        } ?: ServerResponse.badRequest().buildAndAwait()
     }
 
     suspend fun deleteProduct(req: ServerRequest): ServerResponse {
@@ -63,32 +66,37 @@ class ProductHandler(
 
     suspend fun putProduct(req: ServerRequest): ServerResponse {
         val id = req.pathVariable("id").toLong()
-        val productFromBody = req.awaitBody(CreateProductDTO::class)
-        validateCreateProductDTO(productFromBody)
-        return productRepository.findById(id)?.let {
-            ServerResponse
-                .ok()
-                .json()
-                .bodyValueAndAwait(
-                    productRepository.save(productFromBody.toProductEntity(id))
-                )
-        } ?: ServerResponse.notFound().buildAndAwait()
+        val productFromBody = req.awaitBodyOrNull(CreateProductDTO::class)
+
+        return productFromBody?.let { putDto ->
+            validateCreateProductDTO(putDto)
+            productRepository.findById(id)?.let {
+                ServerResponse
+                    .ok()
+                    .json()
+                    .bodyValueAndAwait(
+                        productRepository.save(putDto.toProductEntity(id))
+                    )
+            } ?: ServerResponse.notFound().buildAndAwait()
+        } ?: ServerResponse.badRequest().buildAndAwait()
     }
 
     suspend fun patchProduct(req: ServerRequest): ServerResponse {
         val id = req.pathVariable("id").toLong()
-        val productFromBody = req.awaitBody(PatchProductDTO::class)
+        val productFromBody = req.awaitBodyOrNull(PatchProductDTO::class)
 
-        return productRepository.findById(id)?.let { original ->
-            ServerResponse
-                .ok()
-                .json()
-                .bodyValueAndAwait(
-                    productRepository.save(
-                        productFromBody.toProductEntity(original)
+        return productFromBody?.let { patchDto ->
+            productRepository.findById(id)?.let { original ->
+                ServerResponse
+                    .ok()
+                    .json()
+                    .bodyValueAndAwait(
+                        productRepository.save(
+                            patchDto.toProductEntity(original)
+                        )
                     )
-                )
-        } ?: ServerResponse.notFound().buildAndAwait()
+            } ?: ServerResponse.notFound().buildAndAwait()
+        } ?: ServerResponse.badRequest().buildAndAwait()
     }
 
     /**
