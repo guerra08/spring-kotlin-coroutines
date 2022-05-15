@@ -2,9 +2,11 @@ package com.example.springkotlincoroutines.integration
 
 import com.example.springkotlincoroutines.domain.Product
 import com.example.springkotlincoroutines.repository.ProductRepository
-import com.ninjasquad.springmockk.SpykBean
+import io.mockk.MockKAnnotations
 import io.mockk.every
+import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.flow.flowOf
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -16,8 +18,11 @@ class ProductIntegrationTests(
     val client: WebTestClient
 ) {
 
-    @SpykBean
+    @MockK
     private lateinit var productRepository: ProductRepository
+
+    @BeforeEach
+    fun setUp() = MockKAnnotations.init(this)
 
     @Test
     fun testGetIndexProduct() {
